@@ -27,27 +27,28 @@ const userSchema = new mongoose.Schema({
       }
     }
   },
-  worldtradingdataToken: {
+  wtdToken: {
     type: String,
     require: true,
-    validate(value) {
-
-    }
   },
-  jwtTokens: [{
+  tokens: [{
     token: {
       type: String,
       require: true
     }
   }],
-  favoriteTickers: [{
+  tickers: [{
     ticker: {
       type: String,
       uppercase: true,
       trim: true,
-      validate(value) {
-
-      }
+    }
+  }],
+  fx: [{
+    fx: {
+      type: String,
+      uppercase: true,
+      trim: true
     }
   }]
 }, {
@@ -73,6 +74,12 @@ userSchema.methods.generateJWTAuthToken = async function() {
   user.jwtTokens = user.jwtTokens.concat({token});
   await user.save();
   return token;
+};
+
+userSchema.methods.getMatchedTicker = function(ticker) {
+  const user = this;
+  const matchedTicker = user.favoriteTickers.filter((tickerObj) => tickerObj.ticker === ticker);
+  return matchedTicker
 };
 
 userSchema.statics.findByCredentials = async (name, password) => {
