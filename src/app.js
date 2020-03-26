@@ -2,14 +2,15 @@ const express = require('express');
 require('./db/mongoose');
 const userRouter = require('./routers/user');
 const stockRouter = require('./routers/stock');
+const fxRouter = require('./routers/fx');
+// const followingRouter = require('./routers/following');
 
 const app = express();
-const port = process.env.PORT;
 
 app.use(express.json());
 app.use(userRouter);
 app.use(stockRouter);
+app.use(fxRouter);
+// app.use(followingRouter);
 
-app.listen(port, () => {
-  console.log('Server is up!');
-});
+module.exports = app;

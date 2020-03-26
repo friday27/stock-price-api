@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 
 //provide the db name as part of the connection URL
-mongoose.connect('mongodb://127.0.0.1:27017/stock-price-api', {
+mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useCreateIndex: true
 });
