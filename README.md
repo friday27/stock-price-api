@@ -1,69 +1,138 @@
-# Stock Price API
+# Stock/Forex Price API
 
-Track stock prices in user's favorite list.
+A backend beginner's side project based on Finnhub API
 
 * With user-provided finnhub token, the API will call finnhub API and display neat stock information (in JSON)
 * Users can create their own watchlists, and set it to private or public
 * Show stock chart (rank by popularity, total queries, name, ticker, current price, volumn)
 * List users' held stocks and revenue
 
-## Schedule
-
-* 3/27 ~ 3/29 Design
-* 3/30 ~ 4/07 TDD & Coding
-* 4/08 ~ 4/09 Documents
-
 ## TODOs
 
+* PUT v.s. PATCH
 * Create stock list (stock name, company, ticker)
-* Automatically fetch the prices and volumns after 4 pm on weekdays
-
 * Auth
 * Logging
 * Versioning
 
+* Multi-threading update? (A and B are trying to follow the same ticker at the same time.)
+
+## Goals
+
+* Users are allowed to create accounts with unique finnhub token.
+* Provide a simple and convienient way to allow users to fetch information of stock/forex in their watchlists.
+* Users are allowed to (batch) update stock/forex watchlists. (PUT?)
+* Users are allowed to delete their accounts.
+* Users are allowed to set their profile to public or private (default: private).
+* Users are allowed to follow public profiles.
+* Provide charts of on popular stocks, forex, usernames.
+* Users are allowed to save held amount and prices in private, so there will be revenue and yield to show. (Call Finnhub API by users' tokens)
+* Users are allowed to set ideal and private prices of stocks/forex and get notified daily when the market price meets the ideal price. (through email?) -> Check everyday after 4 pm UTS.
+
+### Questions
+
+* How to save information (held amount/price, ideal price) in private?
+  * Use bcrypt module
+* How to build the base stock/forex collections?
+  * Fetch information from finhub API and save it in JSON seperately.
+* If multiple users want to fetch the same stock/forex price at the same time, what shoule I do to improve the performance?
+  * Check the Price collection before calling Finnhub with user's token. If there's the wanted prices updated within 10 (?) minutes, fetch the data from database, otherwise call Finnhub API.
+  * If the time frame is outside of trading hours (9:30 am to 4 pm on weekdays) or is on a stock market holiday, directly fetch data from database.
+  * Note: Summer Time
+
 ## Object Models
-
-### Stock - Generated in advance
-
-* Object id
-* (Required)   String ticker
-* (Required)   String name
-* (Required)   String company
-* (Default: 0) Number popularity
-* (Default: 0) Number queries
-* (Default: 0) Number last-close-price
-* (Default: 0) Number last-close-volume
 
 ### User
 
-* ObjectID id
-* (Required)       String username
-* (Default: false) String public-stock (Since there'll be FX watchlist in the future, users should be allowed to set privacy seperately)
-* (Default: [])    Array(Object) stocks/ideal-price/held/held-price
+* id
+* username
+* email
+* password
+* finnhubToken
+* public
+* stocks
 
-## Routers
+  * ticker
+    * heldAmount
+    * heldPrice
+    * idealPrice
 
-### {{url}}/stock/
+* forex
 
-* `GET /stocks/` List information of tickers in the user's favoriye list
-* `GET /stocks/:ticker` Get the information of the specific ticker
-* `POST /stocks/:ticker` Add a ticker to user's favorite list
-* `DELETE /stocks/:ticker` Delete a ticker from the user's favorite list
+  * symbol
+    * heldAmount
+    * heldPrice
+    * idealPrice
 
-### {{url}}/fx/
+* followingUsers
+* followedBy
+* profit
+* proficPercent
 
-### {{url}}/users/
+### Stock (Generated from JSON)
 
-* `POST /users/` Create a new user
-* `POST /users/login`
-* `POST /users/logout`
-* `PATCH /users/me` Update user's info
-* `DELETE /users/me` Delete a user
+* id (= finhub id? ticker?)
+* count
+* price
+* updatedAt
+
+### Forex (Generated from JSON)
+
+* id (=finhub id? ticker?)
+* count
+* price
+* updatedAt
+
+## Routers and Test Suites
+
+### /users
+
+* **POST** /users - Create a new account
+* **PATCH** /users - Update user profile
+* **GET** /users - Fetch user profile
+* **DELETE** /users - Delete the current user
+
+* **GET** /users/stocks - Get stock prices and profits in user's watchlist
+* **GET** /users/forex - Get forex prices and profits in user's watchlist
+
+* **GET** /users/followings - Get stock/forex prices in following users' watchlists, rank by popularity/price/ticker
+
+      {
+      ticker1: {
+        price: xxx,
+        updateAt: xxx,
+        inWatchlist: boolean, 
+        followedBy: [userA, userB, ...]
+      }, 
+      ticker2: {...}
+      }
+
+* **PATCH** /users/followings - Add public users into following list by usernames
+  * Parameters: users (A and A,B,C)
+* **DELETE** /users/followings - Delete public users from following list by usernames
+  * Parameters: users (A and A,B,C)
+
+### /charts
+
+* **GET** /charts/stocks - Get stocks chart rank by popularity
+* **GET** /charts/forex - Get forex chart rank by popularity
+* **GET** /charts/users - Get users chart rank by popularity
+
+### /stocks
+
+* **PUT** /stocks - (Batch) update stock from user's watchlist
+* **GET** /stocks - Get stock prices
+  * Default: Stock prices rank by popularity
+  * Parameters:
+    * ticker (A and A,B,C)
+    * user (me or other public usernames)
+* **DELETE**: /stocks - (Batch) delete stock from user's watchlist
+
+### /forex
+
+------
 
 ## New Features
 
-* FX information
-* Notify users when stocks in their watchlist meet the ideal price
-* Line chart
-* Taiwan stock information
+* ETF
+  * [ETF Database](https://etfdb.com/screener/)
