@@ -1,104 +1,74 @@
 const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
 const validator = require('validator');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
+const isValidFinnhubToken = require('../utils/token-validator');
 
 const userSchema = new mongoose.Schema({
-  name: {
+  username: {
     type: String,
+    trim: true,
+    lowercase: true,
     unique: true,
-    require: true,
-    trim: true,
-    lowercase: true
-  },
-  password: {
-    type: String,
-    require: true,
-    minlength: 6,
-    trim: true,
+    required: true
   },
   email: {
     type: String,
+    trim: true,
+    lowercase: true,
     unique: true,
-    require: true,
-    validate(value) {
+    required: true,
+    validator(value) {
       if (!validator.isEmail(value)) {
-        throw new Error('Please enter a valid email.');
+        throw new Error('Email address is invalid.');
       }
     }
   },
-  wtdToken: {
+  password: {
     type: String,
-    require: true,
+    required: true
   },
-  tokens: [{
-    token: {
-      type: String,
-      require: true
+  finnhubToken: {
+    type: String,
+    required: true,
+    trim: true,
+    unique: true,
+    validator(value) {
+      if (!isValidFinnhubToken(value)) {
+        throw new Error('It is not a valid Finnhub API Token. Please try again.');
+      }
     }
-  }],
-  tickers: [{
-    ticker: {
+  },
+  public: {
+    type: Boolean,
+    default: false
+  },
+  jsonWebTokens: [{
+    jsonWebToken: {
       type: String,
-      uppercase: true,
-      trim: true,
-    }
-  }],
-  fx: [{
-    fx: {
-      type: String,
-      uppercase: true,
-      trim: true
+      required: true
     }
   }]
-}, {
-  timestamps: true
 });
 
-// overwrite toJSON instance method to hide private info
+// Overwrite toJSON() to remove private data
 userSchema.methods.toJSON = function() {
   const user = this;
   const userObj = user.toObject();
 
   delete userObj.password;
-  delete userObj.email;
-  delete userObj.worldtradingdataToken;
-  delete userObj.jwtTokens;
+  delete userObj.jsonWebTokens;
 
   return userObj;
 };
 
-userSchema.methods.generateJWTAuthToken = async function() {
+// Bcrypt password before saving
+userSchema.pre('save', function(next) {
   const user = this;
-  const token = jwt.sign({_id: user._id.toString()}, 'friday27stockpriceapitw');
-  user.jwtTokens = user.jwtTokens.concat({token});
-  await user.save();
-  return token;
-};
 
-userSchema.methods.getMatchedTicker = function(ticker) {
-  const user = this;
-  const matchedTicker = user.favoriteTickers.filter((tickerObj) => tickerObj.ticker === ticker);
-  return matchedTicker
-};
-
-userSchema.statics.findByCredentials = async (name, password) => {
-  const user = await User.findOne({name});
-  if (!user) {
-    throw new Error('Unable to login.');
-  }
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    throw new Error('Unable to login.');
-  }
-  return user;
-};
-
-userSchema.pre('save', async function(next) {
-  const user = this;
   if (user.isModified('password')) {
     user.password = await bcrypt.hash(user.password, 8);
   }
+
   next();
 });
 

@@ -70,3 +70,5 @@ REST APIs are implemented for a **resource** which could be an entity or service
   * PATCH - Partially upate
 
 * [HTTP Status Code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
+
+* env-cmd `./node_modules/.bin/env-cmd -f ./config/dev.env node xxx.js`

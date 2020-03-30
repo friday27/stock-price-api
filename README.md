@@ -4,13 +4,34 @@ A backend beginner's side project based on Finnhub API
 
 ## TODOs
 
-* PUT v.s. PATCH
-* Create stock list (stock name, company, ticker)
+* Create stock/forex collections (price model) [done]
+
+* models
+  * user
+  * stock
+  * forex
+
+* tests/fixtures/db.js
+
+* Test suites and routers
+  * user
+  * stock
+  * forex
+  * chart
+
 * Auth
 * Logging
 * Versioning
 
 * Multi-threading update? (A and B are trying to follow the same ticker at the same time.)
+
+* Automaticallly update Price collection
+  * Stock/forex symbols
+
+### Questions
+
+* Diff between fs.writeFileSync and fs.writeFile?
+* Why use mongoose.model not mongoose.Model?
 
 ## Goals
 
@@ -24,7 +45,7 @@ A backend beginner's side project based on Finnhub API
 
 * Provide charts of on popular stocks, forex, usernames.
 
-### Questions
+### Discussion
 
 * How to save information (held amount/price, ideal price) in private?
   * Use bcrypt module
@@ -48,11 +69,15 @@ A backend beginner's side project based on Finnhub API
 * Boolean   public (default: false)
 * Array     jwt
 
-### Price (Generated from JSON)
+### Price (Pre-generated from JSON)
 
 * ObjectID  id
+* String    name
+* String    symbol (unique)
 * String    type (stock/forex)
-* String    symbol
+* String    description
+* String    country
+* String    currency
 * Number    price (in US dollars)
 * Number    popularity (the number of people who are watching this stock/forex)
 * Date      updatedAt
