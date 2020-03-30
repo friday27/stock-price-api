@@ -30,9 +30,6 @@ A backend beginner's side project based on Finnhub API
 
 ### Questions
 
-* Diff between fs.writeFileSync and fs.writeFile?
-* Why use mongoose.model not mongoose.Model?
-
 ## Goals
 
 * Users are allowed to create accounts with unique finnhub token.

@@ -72,3 +72,9 @@ REST APIs are implemented for a **resource** which could be an entity or service
 * [HTTP Status Code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
 
 * env-cmd `./node_modules/.bin/env-cmd -f ./config/dev.env node xxx.js`
+
+### [File I/O](https://stackabuse.com/writing-to-files-in-node-js/)
+
+* `fs.writeFile()` writes data to files asynchronously.
+* `fs.writeFileSync()` performs input/output operations synchronously, blocking the Node.js event loop while the file is written.
+* Both `fs.writeFile()` and `fs.writeFileSync()` will create a new file every time or replace all the contents, so we should use `fs.appendFile()` to update an existing file.
