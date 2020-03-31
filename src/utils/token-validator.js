@@ -1,16 +1,20 @@
 const request = require('request');
 
 function isValidFinnhubToken(token) {
-  request(`https://finnhub.io/api/v1/stock/exchange?token=${token}`, {json: true}, (err, res, body) => {
+  const {error, result} = request(`https://finnhub.io/api/v1/stock/exchange?token=${token}`, {json: true}, (err, res, body) => {
     if (err) { 
-      return console.log(err); 
+      return err; 
     }
     body = JSON.stringify(body);
     if (body.includes('Invalid API key')) {
-      return console.log(false);
+      return false;
     }
-    return console.log(true);
+    return true;
   });
+  if (!error && result) {
+    return true;
+  }
+  return false;
 };
 
 module.exports = isValidFinnhubToken;

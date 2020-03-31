@@ -17,6 +17,9 @@ A backend beginner's side project based on Finnhub API
   * forex
   * chart
 
+* Update isValidFinnhubToken()
+* Fix test case: 'Should not create a user with invalid Finnhub API token' by using empty string
+
 * Auth
 * Logging
 * Versioning
@@ -57,7 +60,7 @@ A backend beginner's side project based on Finnhub API
 ### User
 
 * ObjectID  id
-* String    username (required)
+* String    name (required)
 * String    email (required)
 * String    password (required)
 * String    finnhubToken (required)
@@ -108,10 +111,10 @@ A backend beginner's side project based on Finnhub API
 
 #### Test Cases - Users
 
-* Should create a new user with valid data (set public to false by default, create a jwt, check db)
-* Should not create a user with duplicated username
-* Should not create a user with invalid email
-* Should not create a user with invalid Finnhub API token
+* Should create a new user with valid data (set public to false by default, create a jwt, check db) [done]
+* Should not create a user with duplicated username [done]
+* Should not create a user with invalid email [done]
+* Should not create a user with invalid Finnhub API token [done]
 
 * Should delete a user with authentication (check db)
 * Should not delete a user without authentication

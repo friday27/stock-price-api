@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const isValidFinnhubToken = require('../utils/token-validator');
 
 const userSchema = new mongoose.Schema({
-  username: {
+  name: {
     type: String,
     trim: true,
     lowercase: true,
@@ -29,12 +30,12 @@ const userSchema = new mongoose.Schema({
   },
   finnhubToken: {
     type: String,
-    required: true,
     trim: true,
     unique: true,
+    required: true,
     validator(value) {
       if (!isValidFinnhubToken(value)) {
-        throw new Error('It is not a valid Finnhub API Token. Please try again.');
+        throw new Error(`${value} is not a valid Finnhub API Token. Please try again.`);
       }
     }
   },
@@ -52,6 +53,14 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
+userSchema.methods.generateAuthToken = async function() {
+  const user = this;
+  const token = jwt.sign({_id: user._id.toString()}, process.env.JWT_SECRET);
+  user.jsonWebTokens = user.jsonWebTokens.concat({jsonWebToken: token});
+  await user.save();
+  return token;
+};
+
 // Overwrite toJSON() to remove private data
 userSchema.methods.toJSON = function() {
   const user = this;
@@ -64,7 +73,7 @@ userSchema.methods.toJSON = function() {
 };
 
 // Bcrypt password before saving
-userSchema.pre('save', function(next) {
+userSchema.pre('save', async function(next) {
   const user = this;
 
   if (user.isModified('password')) {
