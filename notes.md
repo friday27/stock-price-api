@@ -73,6 +73,14 @@ REST APIs are implemented for a **resource** which could be an entity or service
 
 * env-cmd `./node_modules/.bin/env-cmd -f ./config/dev.env node xxx.js`
 
+* Force the name of collection to be xxx using mongoose
+
+      const sthSchema = new mongoose.Schema({...}, {
+        timestamps: true,
+        // ...
+        collection: 'something'
+      });
+
 ### [File I/O](https://stackabuse.com/writing-to-files-in-node-js/)
 
 * `fs.writeFile()` writes data to files asynchronously.

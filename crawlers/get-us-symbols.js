@@ -63,7 +63,9 @@ const priceSchema = new mongooese.Schema({
   popularity: {
     type: Number,
     default: 0
-  }
+  },
+}, {
+  timestamps: true
 });
 
 const Price = mongooese.model('Price', priceSchema);

@@ -48,6 +48,8 @@ const userSchema = new mongoose.Schema({
       required: true
     }
   }]
+}, {
+  timestamps: true
 });
 
 // Overwrite toJSON() to remove private data

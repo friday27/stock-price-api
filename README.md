@@ -5,12 +5,10 @@ A backend beginner's side project based on Finnhub API
 ## TODOs
 
 * Create stock/forex collections (price model) [done]
-
 * models
   * user
   * stock
   * forex
-
 * tests/fixtures/db.js
 
 * Test suites and routers
@@ -66,11 +64,12 @@ A backend beginner's side project based on Finnhub API
 * Boolean   public (default: false)
 * Array     jwt
 
-### Price (Pre-generated from JSON)
+### Price (A collection of all investment tools (stock/forex), which is pre-generated from JSON.)
 
 * ObjectID  id
-* String    name
 * String    symbol (unique)
+* String    displaySymbol
+* String    exchange
 * String    type (stock/forex)
 * String    description
 * String    country
@@ -92,6 +91,7 @@ A backend beginner's side project based on Finnhub API
 * ObjectID  id
 * ObjectID  userId
 * String    symbol
+* String    exchange
 * Number    cost
 * Number    amount
 
