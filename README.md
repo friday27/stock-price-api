@@ -5,11 +5,13 @@ A backend beginner's side project based on Finnhub API
 ## TODOs
 
 * Create stock/forex collections (price model) [done]
-* models
+* models [done]
   * user
   * stock
   * forex
-* tests/fixtures/db.js
+* tests/fixtures/db.js [done]
+
+* Auth
 
 * Test suites and routers
   * user
@@ -20,7 +22,6 @@ A backend beginner's side project based on Finnhub API
 * Update isValidFinnhubToken()
 * Fix test case: 'Should not create a user with invalid Finnhub API token' by using empty string
 
-* Auth
 * Logging
 * Versioning
 
