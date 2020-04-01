@@ -11,16 +11,14 @@ A backend beginner's side project based on Finnhub API
   * forex
 * tests/fixtures/db.js [done]
 
-* Auth
+* Auth [done]
 
 * Test suites and routers
-  * user
+  * user [done]
   * stock
   * forex
   * chart
-
-* Update isValidFinnhubToken()
-* Fix test case: 'Should not create a user with invalid Finnhub API token' by using empty string
+  * TODOs
 
 * Logging
 * Versioning
@@ -109,32 +107,6 @@ A backend beginner's side project based on Finnhub API
 * **GET**     /users - Get user profile
 * **POST**    /users/login - Login and get a JSON Web Token
 * **POST**    /users/logout - Logout and remove the JSON Web Token
-
-#### Test Cases - Users
-
-* Should create a new user with valid data (set public to false by default, create a jwt, check db) [done]
-* Should not create a user with duplicated username [done]
-* Should not create a user with invalid email [done]
-* Should not create a user with invalid Finnhub API token [done]
-
-* Should delete a user with authentication (check db)
-* Should not delete a user without authentication
-
-* Should update user profile with valid data (allow to change: email, password, finnhubToken, public) and authentication (check db)
-* Should not update username
-* Should not update user profile with invalid email
-* Should not update user profile with invalid finnhub token
-* Should not update user profile with invalid authentication
-* Should not update user profile without authentication
-
-* Should return user profile with authentication
-* Should not return user profile without authtication
-
-* Should login with valid username and password
-* Should not login with non-existing username
-* Should not login with invalid password
-* Should logout with authentication (check db: jwt)
-* Should not logout without authentication
 
 ### /stocks
 

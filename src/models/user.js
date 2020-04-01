@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     unique: true,
     required: true,
-    validator(value) {
+    validate(value) {
       if (!validator.isEmail(value)) {
         throw new Error('Email address is invalid.');
       }
@@ -33,10 +33,15 @@ const userSchema = new mongoose.Schema({
     trim: true,
     unique: true,
     required: true,
-    validator(value) {
-      if (!isValidFinnhubToken(value)) {
-        throw new Error(`${value} is not a valid Finnhub API Token. Please try again.`);
-      }
+    validate(value) {
+      // if (!isValidFinnhubToken(value)) {
+      //   throw new Error(`${value} is not a valid Finnhub API Token. Please try again.`);
+      // }
+      isValidFinnhubToken(value, (err) => {
+        if (err) {
+          throw new Error(`${value} is not a valid Finnhub API Token. Please try again.`);
+        }
+      });
     }
   },
   public: {
@@ -52,6 +57,18 @@ const userSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+userSchema.statics.findByCredentials = async function (name, password) {
+  const user = await User.findOne({name});
+  if (!user) {
+    throw new Error('Unable to login.');
+  }
+  const isMatch = await bcrypt.compare(password, user.password); //(plain, hashed)
+  if (!isMatch) {
+    throw new Error('Unable to login.');
+  }
+  return user;
+};
 
 userSchema.methods.generateAuthToken = async function() {
   const user = this;
