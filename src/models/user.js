@@ -34,9 +34,6 @@ const userSchema = new mongoose.Schema({
     unique: true,
     required: true,
     validate(value) {
-      // if (!isValidFinnhubToken(value)) {
-      //   throw new Error(`${value} is not a valid Finnhub API Token. Please try again.`);
-      // }
       isValidFinnhubToken(value, (err) => {
         if (err) {
           throw new Error(`${value} is not a valid Finnhub API Token. Please try again.`);

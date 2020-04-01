@@ -1,8 +1,12 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 const User = require('../../src/models/user');
 const Stock = require('../../src/models/stock');
 const Forex = require('../../src/models/forex');
+const Price = require('../../src/models/price');
+let stockSymbolsUS = require('../../data/us-stock-symbols.json');
+let forexSymbols = require('../../data/forex-symbols.json');
 
 const user1Id = new mongoose.Types.ObjectId();
 const user1 = {
@@ -107,6 +111,26 @@ const user1_forex2 = {
 //   amount: 6000
 // };
 
+// Create price collection from ./data
+// Compile stock data into writable format
+// let stockSymbolsUS = fs.readFileSync(folder+'/us-stock-symbols.json');
+// stockSymbolsUS = JSON.parse(stockSymbolsUS);
+stockSymbolsUS.forEach((stockObj) => {
+  stockObj.exchange = 'US exchanges';
+  stockObj.type = 'stock';
+  stockObj.country = 'US';
+  stockObj.currency = 'USD';
+});
+
+// Compile forex data into writable format
+// let forexSymbols = fs.readFileSync(folder+'/forex-symbols.json');
+// forexSymbols = JSON.parse(forexSymbols);
+forexSymbols.forEach((forexObj) => {
+  forexObj.exchange = forexObj.symbol.split(':')[0];
+  forexObj.type = 'forex';
+  forexObj.country = 'multi';
+  forexObj.currency = 'multi';
+});
 
 const setupDatabase = async function() {
   await User.deleteMany();
@@ -129,8 +153,15 @@ const setupDatabase = async function() {
   // await new Forex(user2_forex5).save();
 };
 
+const createPriceCollection = async function() {
+  await Price.deleteMany();
+  await Price.insertMany(stockSymbolsUS);
+  await Price.insertMany(forexSymbols);
+};
+
 module.exports = {
   user1,
   // user2,
-  setupDatabase
+  setupDatabase,
+  createPriceCollection
 };

@@ -16,12 +16,16 @@ A backend beginner's side project based on Finnhub API
 * Test suites and routers
   * user [done]
   * stock
+    * Issue
+      * create price collection
+    * Support /stocks?ticker=XXX for now, next: to support searching for multiple tickers
   * forex
   * chart
-  * TODOs
 
 * Logging
 * Versioning
+
+* Clean up files
 
 * Multi-threading update? (A and B are trying to follow the same ticker at the same time.)
 
@@ -117,6 +121,11 @@ A backend beginner's side project based on Finnhub API
 
 #### Test Cases - Stocks
 
+* Should get the information of tickers with parameter ticker [done]
+* Should not get the information of tickers with parameter ticker but without authentication [done]
+* Should get the information of tickers, profits and returns in watchlish without any parameter
+* Should not get the information of tickers in watchlish without any parameter nor without authentication
+
 * Should add tickers into user's watchlist with held price and amount (check db)
 * Should add tickers into user's watchlist without held price and amount (check db)
 * Should not add tickers into user's watchlist with negative held price
@@ -138,11 +147,6 @@ A backend beginner's side project based on Finnhub API
 * Should not delete tickers from user's watchlist if held amount > 0
 * Should not delete tickers which are not in user's watchlist
 * Should not delete tickers from user's watchlist without authentication
-
-* Should get the information of tickers with parameter ticker
-* Should not get the information of tickers with parameter ticker but without authentication
-* Should get the information of tickers, profits and returns in watchlish without any parameter
-* Should not get the information of tickers in watchlish without any parameter nor without authentication
 
 ### /forex
 
