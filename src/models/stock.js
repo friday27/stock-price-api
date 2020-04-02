@@ -13,19 +13,19 @@ const stockSchema = new mongoose.Schema({
   },
   cost: {
     type: Number,
-    default: null,
+    default: 0,
     validate(value) {
-      if (value <= 0) {
-        throw new Error('The cost should not be 0 or any negative number!');
+      if (value < 0) {
+        throw new Error('The cost should not be any negative number!');
       }
     }
   },
   amount: {
     type: Number,
-    default: null,
+    default: 0,
     validate(value) {
-      if (value <= 0) {
-        throw new Error('The amount should not be 0 or any negative number!');
+      if (value < 0) {
+        throw new Error('The amount should not be any negative number!');
       }
     }
   }

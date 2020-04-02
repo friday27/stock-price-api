@@ -16,8 +16,11 @@ A backend beginner's side project based on Finnhub API
 * Test suites and routers
   * user [done]
   * stock
-    * Issue
+    * Issues
       * create price collection
+    * utils/get-latest-price.js -> update method
+    * routers/stock.js/getStockPrice() -> callback and error message
+    * routers/stock.js -> add time constrains to get /stocks (if it's bank holiday or off hours, do not update price info)
     * Support /stocks?ticker=XXX for now, next: to support searching for multiple tickers
   * forex
   * chart
@@ -117,22 +120,16 @@ A backend beginner's side project based on Finnhub API
 * **POST**    /stocks - Add stocks into the user's watchlist (with/without heldPrice and heldAmount)
 * **PATCH**   /stocks - Add buying (amount > 0)/ selling (amount < 0) records of stocks on the specific price and amount, or add the ticker into watchlish without price and amount
 * **DELETE**  /stocks - Remove tickers from watchlist if the held amount = 0
-* **GET**     /stocks - Get the user's stock watchlist with calculated profit and return(%). If the parameter tickers is set (`/stocks?tickers=AAA`), return the stock information without profit and return.
+* **GET**     /stocks/ticker?q=symbol - Return the stock information without profit and return.
+* **GET**     /stocks - Get the user's stock watchlist with calculated profit and return(%).
 
 #### Test Cases - Stocks
 
-* Should get the information of tickers with parameter ticker [done]
-* Should not get the information of tickers with parameter ticker but without authentication [done]
-* Should get the information of tickers, profits and returns in watchlish without any parameter
-* Should not get the information of tickers in watchlish without any parameter nor without authentication
-
+* Should add tickers into user's watchlist without held price and amount (check db) [done]
 * Should add tickers into user's watchlist with held price and amount (check db)
-* Should add tickers into user's watchlist without held price and amount (check db)
 * Should not add tickers into user's watchlist with negative held price
-* Should not add duplicated ticker into user's watchlish without held price and amount
 * Should not add non-exising tickers into user's watchlist
 * Should not add tickers into user's watchlist without authentication
-
 * Should add selling records into user profile (check db)
 * Should add buying records into user profile (check db)
 * Should not add selling records when the stock amount held by the user < selling amount
