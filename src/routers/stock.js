@@ -84,27 +84,70 @@ router.get('/stocks', auth, async (req, res) => {
 });
 
 // Add tickers into the user's watchlish
+
+/*
+- Examine if the ticker is valid
+- Save ticker
+- update ticker popularity
+*/
 router.post('/stocks', auth, async (req, res) => {
-  if (!req.query.tickers) {
+  const tickerObj = await req.body;
+  if (!tickerObj || !tickerObj.ticker) {
     res.status(400).send();
   }
 
-  try {
-    const tickers = await req.query.tickers.split(',');
-    tickers.forEach(async (ticker) => {
-      const foundStock = await Stock.findOne({userId: req.user._id, ticker});
-      if (!foundStock) {
-        const transac = await new Stock({
-          userId: req.user._id,
-          ticker
-        });
-        await transac.save();
+  // Check if the ticker is supported
+  const isSupported = await Price.findOne({displaySymbol: tickerObj.ticker});
+  if (!isSupported) {
+    res.status(404).send();
+  }
+
+  // If there's no cost/amount, check if it's saved already.
+  if (!tickerObj.cost || !tickerObj.amount || tickerObj.cost === 0 || tickerObj.amount === 0) {
+    const foundDup = await Stock.findOne({userId: req.user._id, ticker: tickerObj.ticker, cost: 0, amount: 0});
+    if (foundDup) {
+      res.status(400).send();
+    }
+  } else if (tickerObj.amount < 0) {
+    // Check if the user's held amount + adding amount >= 0 (for selling record)
+    let heldStocks = await Stock.aggregate([{
+      $match: {
+        userId: req.user._id.toString(),
+        ticker: tickerObj.ticker
       }
+    }, {
+      $group: {
+        _id: '$ticker',
+        totalAmount: {$sum: '$amount'}
+      }
+    }]);
+    heldStocks = heldStocks[0];
+    if (!heldStocks || heldStocks.totalAmount + tickerObj.amount < 0) {
+      res.status(400).send();
+    }
+  }
+
+  try {
+    // Save tickerObj
+    const transaction = await new Stock({
+      userId: req.user._id,
+      ticker: tickerObj.ticker,
+      cost: tickerObj.cost,
+      amount: tickerObj.amount
     });
-    res.status(201).send();
+    await transaction.save();
+
+    // Update stock popularity
+    let addingPop = 1;
+    if (tickerObj.amount < 0) {
+      addingPop = -1;
+    }
+    await Price.findOneAndUpdate({displaySymbol: tickerObj.ticker}, {$inc: {popularity: addingPop}});
+
+    res.status(201).send(transaction);
   } catch (e) {
     res.status(400).send();
-  } 
+  }
 });
 
 // Add tickers along with cost and amount into the user's watchlist

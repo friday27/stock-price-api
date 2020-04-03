@@ -20,14 +20,9 @@ const stockSchema = new mongoose.Schema({
       }
     }
   },
-  amount: {
+  amount: { // negative = selling record
     type: Number,
     default: 0,
-    validate(value) {
-      if (value < 0) {
-        throw new Error('The amount should not be any negative number!');
-      }
-    }
   }
 }, {
   timestamps: true
