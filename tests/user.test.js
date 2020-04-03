@@ -15,9 +15,9 @@ beforeEach(async () => {
   await setupDatabase();
 });
 
-// afterAll(async () => {
-//   // await mongoose.connection.close();
-// });
+afterAll(async () => {
+  await mongoose.connection.close();
+});
 
 describe('Test POST /users', () => {
   test('Should create a new user with valid data', async() => {
@@ -197,7 +197,7 @@ describe('Test PATCH /users', () => {
 describe('Test GET /users', () => {
   test('Should return user profile with authentication', async () => {
     await request(app)
-      .get('/users')
+      .get('/users/me')
       .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
       .send()
       .expect(200);
@@ -205,7 +205,8 @@ describe('Test GET /users', () => {
 
   test('Should not return user profile without authtication', async () => {
     await request(app)
-      .get('/users')
+      .get('/users/me')
+      .set('Authorization', `Bearer`)
       .send()
       .expect(401);
   });

@@ -42,6 +42,11 @@ const user1_stock3 = {
   amount: 20
 };
 
+const user1_stock4 = {
+  userId: user1Id,
+  ticker: 'NKE'
+};
+
 const user1_forex1 = {
   userId: user1Id,
   symbol: 'OANDA:GBP_USD',
@@ -141,6 +146,7 @@ const setupDatabase = async function() {
   await new Stock(user1_stock1).save();
   await new Stock(user1_stock2).save();
   await new Stock(user1_stock3).save();
+  await new Stock(user1_stock4).save();
   await new Forex(user1_forex1).save();
   await new Forex(user1_forex2).save();
 

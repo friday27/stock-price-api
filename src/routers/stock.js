@@ -5,11 +5,11 @@ const {updateStockPrice, getTickerInfo} = require('../utils/get-latest-price');
 const Stock = require('../models/stock');
 const Price = require('../models/price');
 
-router.get('/stocks/ticker', auth, async (req, res) => {
-  if (!req.query.q) {
+router.get('/stocks/:ticker', auth, async (req, res) => {
+  if (!req.params.ticker) {
     res.status(400).send();
   }
-  await getTickerInfo(req.user.finnhubToken, req.query.q, (err, result) => {
+  await getTickerInfo(req.user.finnhubToken, req.params.ticker, (err, result) => {
     if (err) {
       res.status(400).send();
     }
@@ -93,20 +93,20 @@ router.get('/stocks', auth, async (req, res) => {
 router.post('/stocks', auth, async (req, res) => {
   const tickerObj = await req.body;
   if (!tickerObj || !tickerObj.ticker) {
-    res.status(400).send();
+    return res.status(400).send();
   }
 
   // Check if the ticker is supported
   const isSupported = await Price.findOne({displaySymbol: tickerObj.ticker});
   if (!isSupported) {
-    res.status(404).send();
+    return res.status(404).send();
   }
 
   // If there's no cost/amount, check if it's saved already.
   if (!tickerObj.cost || !tickerObj.amount || tickerObj.cost === 0 || tickerObj.amount === 0) {
     const foundDup = await Stock.findOne({userId: req.user._id, ticker: tickerObj.ticker, cost: 0, amount: 0});
     if (foundDup) {
-      res.status(400).send();
+      return res.status(400).send();
     }
   } else if (tickerObj.amount < 0) {
     // Check if the user's held amount + adding amount >= 0 (for selling record)
@@ -123,7 +123,7 @@ router.post('/stocks', auth, async (req, res) => {
     }]);
     heldStocks = heldStocks[0];
     if (!heldStocks || heldStocks.totalAmount + tickerObj.amount < 0) {
-      res.status(400).send();
+      return res.status(400).send();
     }
   }
 
@@ -150,8 +150,44 @@ router.post('/stocks', auth, async (req, res) => {
   }
 });
 
-// Add tickers along with cost and amount into the user's watchlist
-// router.patch('/stocks', auth, async (res, res) => {
-// });
+router.delete('/stocks/:ticker', auth, async (req, res) => {
+  let heldStock = await Stock.aggregate([
+    {
+      $match: {
+        userId: req.user._id.toString(),
+        ticker: req.params.ticker
+      }
+    },
+    {
+      $group: {
+        _id: '$ticker',
+        totalAmount: {$sum: '$amount'}
+      }
+    }
+  ])
+  heldStock = heldStock[0];
+
+  // Check if the ticker is in user's watchlist
+  if (!heldStock) {
+    return res.status(404).send();
+  }
+
+  // Check if the held amount is greater than 0
+  if (heldStock.totalAmount > 0) {
+    return res.status(400).send();
+  }
+
+  // Delete held stock
+  try {
+    const deleted = await Stock.deleteMany({
+      userId: req.user._id,
+      ticker: req.params.ticker
+    });
+  
+    res.send(deleted);
+  } catch (e) {
+    res.status(500).send();
+  }
+});
 
 module.exports = router;

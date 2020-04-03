@@ -16,13 +16,14 @@ beforeAll(async () => {
   // await createPriceCollection();
 });
 
-// beforeEach(async () => {
-// });
+afterAll(async () => {
+  await mongoose.connection.close();
+});
 
 describe('Test GET /stocks', () => {
   test('Should get the information of with parameter ticker', async () => {
     await request(app)
-      .get('/stocks/ticker?q=GOOGL')
+      .get('/stocks/GOOGL')
       .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
       .send()
       .expect(200);
@@ -49,23 +50,24 @@ describe('Test GET /stocks', () => {
 // Add stocks into watchlish without held price and amount
 describe('Test POST /stocks', () => {
   test('Should add ticker into user\'s watchlist without held price and amount', async () => {
+    const t = 'TMO';
     // Save the original popularity
-    const price = await Price.findOne({displaySymbol: 'FB'});
+    const price = await Price.findOne({displaySymbol: t});
     const pop = price.popularity;
 
     await request(app)
       .post('/stocks')
       .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
       .send({
-        ticker: 'FB'
+        ticker: t
       })
       .expect(201);
 
     // Assert the ticker is saved in database
-    const foundTicker = await Stock.findOne({userId: user1._id, ticker: 'FB', cost: 0, amount: 0});
+    const foundTicker = await Stock.findOne({userId: user1._id, ticker: t, cost: 0, amount: 0});
     expect(foundTicker).not.toBeNull();
     // Assert the popularity of ticker += 1
-    const afterPrice = await Price.findOne({displaySymbol: 'FB'});
+    const afterPrice = await Price.findOne({displaySymbol: t});
     const afterPop = afterPrice.popularity;
     expect(afterPop-pop).toBe(1);
   });
@@ -170,4 +172,62 @@ describe('Test POST /stocks', () => {
       })
       .expect(400);
   })
+});
+
+describe('Test DELETE /stocks', () => {
+  test('Should delete tickers from user\'s watchlist if held amount is 0', async () => {
+    await request(app)
+      .post('/stocks')
+      .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
+      .send({
+        ticker: 'BMY'
+      })
+      .expect(201);
+    
+    await request(app)
+      .delete('/stocks/BMY')
+      .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
+      .send()
+      .expect(200);
+
+    // Asset the ticker is not in database
+    const foundStock = await Stock.findOne({
+      userId: user1._id,
+      ticker: 'BMY'
+    });
+    expect(foundStock).toBeNull();
+  });
+
+  test('Should not delete tickers from user\'s watchlist if held amount is greater than 0', async () => {
+    await request(app)
+      .post('/stocks')
+      .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
+      .send({
+        ticker: 'PBD',
+        cost: 100,
+        amount: 50
+      })
+      .expect(201);
+
+    await request(app)
+      .delete('/stocks/PBD')
+      .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
+      .send()
+      .expect(400);
+  });
+
+  test('Should not delete tickers which are not in user\'s watchlist', async () => {
+    await request(app)
+      .delete('/stocks/NEE')
+      .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
+      .send()
+      .expect(404);
+  });
+
+  test('Should not delete tickers from user\'s watchlist without authentication', async () => {
+    await request(app)
+      .delete('/stocks/GOOG')
+      .send()
+      .expect(401);
+  });
 });

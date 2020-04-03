@@ -15,15 +15,16 @@ A backend beginner's side project based on Finnhub API
 
 * Test suites and routers
   * user [done]
-  * stock
+  * stock [done]
+  
   * forex
   * chart
+
   * TODOs
     * setupDatabase
       * create price collection
     * routers/stock.js -> add time constrains to get /stocks (if it's bank holiday or off hours, do not update price info)
     * /stocks next: support searching for multiple tickers
-    * Unstable test suite results
 
 * Logging
 * Versioning
@@ -121,21 +122,6 @@ A backend beginner's side project based on Finnhub API
 * **DELETE**  /stocks - Remove tickers from watchlist if the held amount = 0.
 * **GET**     /stocks/ticker?q=symbol - Return the stock information without profit and return.
 * **GET**     /stocks - Get the user's stock watchlist with calculated profit and return(%).
-
-#### Test Cases - Stocks
-
-* Should add tickers into user's watchlist without held price and amount (check db) [done]
-* Should add tickers into user's watchlist with held price and amount (check db) [done]
-* Should not add tickers into user's watchlist with negative held price [done]
-* Should not add non-exising tickers into user's watchlist [done]
-* Should not add tickers into user's watchlist without authentication [done]
-* Should add selling records into user profile (check db) [done]
-* Should not add selling records when the stock amount held by the user < selling amount [done]
-
-* Should delete tickers from user's watchlist if held amount = 0 (check db)
-* Should not delete tickers from user's watchlist if held amount > 0
-* Should not delete tickers which are not in user's watchlist
-* Should not delete tickers from user's watchlist without authentication
 
 ### /forex
 

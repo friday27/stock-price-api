@@ -73,6 +73,8 @@ REST APIs are implemented for a **resource** which could be an entity or service
 
 * env-cmd `./node_modules/.bin/env-cmd -f ./config/dev.env node xxx.js`
 
+* Run a single test suite `npm test -- -u -t="stock"`
+
 * Force the name of collection to be xxx using mongoose
 
       const sthSchema = new mongoose.Schema({...}, {
