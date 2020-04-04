@@ -7,28 +7,11 @@ const forexSchema = new mongoose.Schema({
   },
   symbol: { // includes exchange and forex pair (e.g. OANDA:GBP_USD)
     type: String,
+    unique: true,
     required: true,
     uppercase: true,
     trim: true
   },
-  cost: {
-    type: Number,
-    default: null,
-    validate(value) {
-      if (value <= 0) {
-        throw new Error('The cost should not be 0 or any negative number!');
-      }
-    }
-  },
-  amount: {
-    type: Number,
-    default: null,
-    validate(value) {
-      if (value <= 0) {
-        throw new Error('The amount should not be 0 or any negative number!');
-      }
-    }
-  }
 }, {
   timestamps: true,
   collection: 'forex'

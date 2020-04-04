@@ -22,6 +22,15 @@ function getTickerInfo(token, ticker, callback) {
 });
 };
 
+function getExchangeInfo(token, exchange, callback) {
+  request(`https://finnhub.io/api/v1/forex/symbol?exchange=${exchange}&token=${token}`, {json: true}, (err, res, body) => {
+  if (err) { 
+    callback(err);
+  }
+  callback(null, body);
+  });
+};
+
 function updateStockPrice(token, ticker, callback) {
   request(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${token}`, {json: true}, async (err, res, body) => {
     let price;
@@ -40,9 +49,33 @@ function updateStockPrice(token, ticker, callback) {
     // Price.findOneAndUpdate({displaySymbol: ticker}, {$set: {price: body.c}});
     callback();
   });
-}
+};
+
+function updateFxPrice(token, symbol, callback) {
+  request(`https://finnhub.io/api/v1/forex/candle?symbol=${symbol}&resolution=D&count=1&token=${token}`, {json: true}, async (err, res, body) => {
+    let price;
+    if (err || !body.s || body.s !== 'ok') { 
+      price = await Price.findOne({symbol});
+      price.price = null;
+      price.updatedAt = new Date();
+      await price.save();
+      callback(err);
+    }
+    try {
+      price = await Price.findOne({symbol});
+      price.price = body.c? body.c[0]: null;
+      price.updatedAt = new Date();
+      await price.save();
+      callback();
+    } catch (e) {
+      callback(e);
+    }
+  });
+};
 
 module.exports = {
   updateStockPrice,
-  getTickerInfo
+  updateFxPrice,
+  getTickerInfo,
+  getExchangeInfo
 };

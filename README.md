@@ -17,14 +17,19 @@ A backend beginner's side project based on Finnhub API
   * user [done]
   * stock [done]
   
-  * forex
+  * forex [done]
   * chart
+
+  * Issues
+    * delete user -> delete fx/stock data
+    * symbol issue: FXCM:USD/HKD (use it in POST and DELETE test cases)
 
   * TODOs
     * setupDatabase
       * create price collection
     * routers/stock.js -> add time constrains to get /stocks (if it's bank holiday or off hours, do not update price info)
     * /stocks next: support searching for multiple tickers
+    * GET /fx: adjust output format
 
 * Logging
 * Versioning
@@ -125,9 +130,9 @@ A backend beginner's side project based on Finnhub API
 
 ### /forex
 
-* **PATCH**   /forex - Add forex into the user's watchlist `/forex?symbol=GOOG,APPL`
-* **DELETE**  /forex - Remove forex from the user's watchlist
-* **GET**     /forex - Get the user's forex watchlist with calculated profit and return(%). If the parameter symbols is set (`/forex?symbols=AAA`), return the forex information without profit and return.
+* **POST**    /fx - Add forex into the user's watchlist without cost/amount
+* **DELETE**  /fx - Remove forex from the user's watchlist
+* **GET**     /fx - Get the user's forex watchlist with calculated profit and return(%). If the parameter symbols is set (`/fx?symbols=AAA`), return the forex information without profit and return.
 
 #### Test Cases - Forex
 
