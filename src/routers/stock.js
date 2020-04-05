@@ -5,16 +5,54 @@ const {updateStockPrice, getTickerInfo} = require('../utils/get-latest-price');
 const Stock = require('../models/stock');
 const Price = require('../models/price');
 
-router.get('/stocks/:ticker', auth, async (req, res) => {
-  if (!req.params.ticker) {
-    res.status(400).send();
-  }
-  await getTickerInfo(req.user.finnhubToken, req.params.ticker, (err, result) => {
-    if (err) {
+router.get('/stocks/chart', auth, async (req, res) => {
+  // if (!req.params.ticker) {
+  //   res.status(400).send();
+  // }
+  // await getTickerInfo(req.user.finnhubToken, req.params.ticker, (err, result) => {
+  //   if (err) {
+  //     res.status(400).send();
+  //   }
+  //   res.send(result);
+  // });
+
+  const match = {
+    type: 'stock'
+  };
+  const sort = {
+    'popularity': -1
+  };
+  const sortings = ['symbol','price','popularity','country','currency'];
+
+  if (req.query.sortBy) {
+    const parts = req.query.sortBy.split(':');
+
+    if (!sortings.includes(parts[0])) {
       res.status(400).send();
     }
-    res.send(result);
-  });
+    sort[parts[0]] = parts[1] === 'desc'? -1: 1;
+  }
+
+  if (req.query.symbol) {
+    match.symbol = req.query.symbol;
+  }
+  if (req.query.country) {
+    match.country = req.query.country;
+  }
+  if (req.query.currency) {
+    match.currency = req.query.currency;
+  }
+
+  try {
+    const results = await Price.find(match, null, {
+      sort,
+      skip: req.query.skip,
+      limit: req.query.limit
+    });
+    res.send(results);
+  } catch (e) {
+    res.status(500).send();
+  }
 });
 
 router.get('/stocks', auth, async (req, res) => {

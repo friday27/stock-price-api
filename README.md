@@ -4,14 +4,7 @@ A backend beginner's side project based on Finnhub API
 
 ## TODOs
 
-* Create stock/forex collections (price model) [done]
-* models [done]
-  * user
-  * stock
-  * forex
-* tests/fixtures/db.js [done]
-
-* Auth [done]
+* Create stock/forex collections (price model) while deploying
 
 * Test suites and routers
   * user [done]
@@ -25,6 +18,7 @@ A backend beginner's side project based on Finnhub API
     * symbol issue: FXCM:USD/HKD (use it in POST and DELETE test cases)
 
   * TODOs
+    * add sortBy to /stocks, /fx
     * setupDatabase
       * create price collection
     * routers/stock.js -> add time constrains to get /stocks (if it's bank holiday or off hours, do not update price info)
@@ -125,7 +119,10 @@ A backend beginner's side project based on Finnhub API
 
 * **POST**    /stocks - Add buying (amount > 0)/ selling (amount < 0) records of stocks on the specific price and amount, or add the ticker into watchlish without price and amount.
 * **DELETE**  /stocks - Remove tickers from watchlist if the held amount = 0.
-* **GET**     /stocks/ticker?q=symbol - Return the stock information without profit and return.
+
+* **GET**     /stocks/ticker?q=symbol - Return the stock information
+* **GET**     /stocks/chart - Get stock chart, sortBy: ticker(symbol), price, popularity, country, currency, filterBy: ticker(symbol), price(greater than, smaller than), popularity, country, currency
+
 * **GET**     /stocks - Get the user's stock watchlist with calculated profit and return(%).
 
 ### /forex
@@ -133,14 +130,7 @@ A backend beginner's side project based on Finnhub API
 * **POST**    /fx - Add forex into the user's watchlist without cost/amount
 * **DELETE**  /fx - Remove forex from the user's watchlist
 * **GET**     /fx - Get the user's forex watchlist with calculated profit and return(%). If the parameter symbols is set (`/fx?symbols=AAA`), return the forex information without profit and return.
-
-#### Test Cases - Forex
-
-Check Test Cases - Stocks
-
-### /charts
-
-* **GET** /charts - Return a chart of the specific type (`/charts?type=stock`). sortBy: name, price, popularity
+* **GET**     /fx/chart - Get fx chart, sortBy: symbol, displaySymbol, exchange, price, popularity
 
 #### Test Cases - Charts
 

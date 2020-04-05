@@ -21,21 +21,48 @@ afterAll(async () => {
 });
 
 describe('Test GET /stocks', () => {
-  test('Should get the information of with parameter ticker', async () => {
+  // /stocks/chart
+  test('Should return stock chart', async () => {
     await request(app)
-      .get('/stocks/GOOGL')
+      .get('/stocks/chart')
       .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
       .send()
       .expect(200);
   });
 
-  test('Should not get ticker information without authentication', async () => {
+  test('Should return stock info of a specific ticker', async () => {
     await request(app)
-      .get('/stocks/ticker?q=GOOGL')
+      .get('/stocks/chart?symbol=GOOG')
+      .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
+      .send()
+      .expect(200);
+  });
+
+  test('Should return stock chart with conditions', async () => {
+    await request(app)
+      .get('/stocks/chart?country=US&sortBy=price:desc')
+      .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
+      .send()
+      .expect(200);
+  });
+
+  // sortBy not found
+  test('Should not return stock chart with invalid conditions', async () => {
+    await request(app)
+      .get('/stocks/chart?sortBy=name:desc')
+      .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
+      .send()
+      .expect(400);
+  });
+
+  test('Should not return stock chart without authentication', async () => {
+    await request(app)
+      .get('/stocks/chart')
       .send()
       .expect(401);
-  })
+  });
 
+  // /stocks
   test('Should get ticker information of tickers, profits and returns in watchlish', async () => {
     const response = await request(app)
       .get('/stocks')
