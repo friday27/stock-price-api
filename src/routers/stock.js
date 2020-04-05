@@ -6,22 +6,10 @@ const Stock = require('../models/stock');
 const Price = require('../models/price');
 
 router.get('/stocks/chart', auth, async (req, res) => {
-  // if (!req.params.ticker) {
-  //   res.status(400).send();
-  // }
-  // await getTickerInfo(req.user.finnhubToken, req.params.ticker, (err, result) => {
-  //   if (err) {
-  //     res.status(400).send();
-  //   }
-  //   res.send(result);
-  // });
-
   const match = {
     type: 'stock'
   };
-  const sort = {
-    'popularity': -1
-  };
+  const sort = {};
   const sortings = ['symbol','price','popularity','country','currency'];
 
   if (req.query.sortBy) {
@@ -46,8 +34,8 @@ router.get('/stocks/chart', auth, async (req, res) => {
   try {
     const results = await Price.find(match, null, {
       sort,
-      skip: req.query.skip,
-      limit: req.query.limit
+      skip: parseInt(req.query.skip),
+      limit: parseInt(req.query.limit)
     });
     res.send(results);
   } catch (e) {

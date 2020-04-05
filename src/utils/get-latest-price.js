@@ -42,11 +42,17 @@ function updateStockPrice(token, ticker, callback) {
       // Price.findOneAndUpdate({displaySymbol: ticker}, {$set: {price: null}});
       callback(err);
     }
-    price = await Price.findOne({displaySymbol: ticker});
-    price.price = body.c;
-    price.updatedAt = new Date();
-    await price.save();
-    // Price.findOneAndUpdate({displaySymbol: ticker}, {$set: {price: body.c}});
+    try {
+      price = await Price.findOne({displaySymbol: ticker});
+      price.price = body.c;
+      price.updatedAt = new Date();
+      await price.save();
+      // Price.findOneAndUpdate({displaySymbol: ticker}, {$set: {price: body.c}});
+    } catch (e) {
+      console.log(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${token}`);
+      callback(e);
+    }
+    
     callback();
   });
 };

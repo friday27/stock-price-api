@@ -4,7 +4,8 @@ const priceSchema = new mongooese.Schema({
   exchange: {
     type: String,
     trim: true,
-    require: true
+    require: true,
+    uppercase: true
   },
   displaySymbol: { // no need to be unique
     type: String,

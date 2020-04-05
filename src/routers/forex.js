@@ -5,24 +5,44 @@ const {updateStockPrice, updateFxPrice, getTickerInfo, getExchangeInfo} = requir
 const Forex = require('../models/forex');
 const Price = require('../models/price');
 
-router.get('/fx/:exchange', auth, async (req, res) => {
-  if (!req.params.exchange) {
-    res.status(400).send();
-  }
-
-  // Check if the input exchange is supported.
-  const exchanges = ['oanda', 'fxcm', 'forex.com', 'ic markets', 'fxpro'];
-  const exchange = req.params.exchange.toLowerCase();
-  if (!exchanges.includes(exchange)) {
-    res.status(404).send();
-  }
+router.get('/fx/chart', auth, async (req, res) => {
+  const match = {type: 'forex'};
+  const sort = {};
+  const sortings = ['price', 'popularity', 'symbol', 'displaySymbol'];
   
-  await getExchangeInfo(req.user.finnhubToken, exchange, (err, result) => {
-    if (err) {
+  if (req.query.sortBy) {
+    const parts = req.query.sortBy.split(':');
+
+    if (!sortings.includes(parts[0])) {
       res.status(400).send();
     }
-    res.send(result);
-  });
+
+    sort[parts[0]] = parts[1] === 'desc'? -1: 1; 
+  }
+
+  // const exchanges = ['oanda', 'fxcm', 'forex.com', 'ic markets', 'fxpro'];
+  if (req.query.exchange) {
+    match.exchange = req.query.exchange.toUpperCase();
+  }
+
+  if (req.query.symbol) {
+    match.symbol = req.query.symbol;
+  }
+
+  if (req.query.displaySymbol) {
+    match.displaySymbol = req.query.displaySymbol;
+  }
+
+  try {
+    const results = await Price.find(match, null, {
+      sort,
+      skip: parseInt(req.query.skip),
+      limit: parseInt(req.query.limit)
+    })
+    res.send(results);
+  } catch (e) {
+    res.status(500).send();
+  }
 });
 
 router.get('/fx', auth, async (req, res) => {

@@ -46,7 +46,6 @@ describe('Test GET /stocks', () => {
       .expect(200);
   });
 
-  // sortBy not found
   test('Should not return stock chart with invalid conditions', async () => {
     await request(app)
       .get('/stocks/chart?sortBy=name:desc')

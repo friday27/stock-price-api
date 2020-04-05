@@ -21,17 +21,57 @@ afterAll(async () => {
 });
 
 describe('Test GET /fx', () => {
-  test('Should return supported forex symbols of the exchange', async () => {
+  test('Should return fx chart', async () => {
     await request(app)
-      .get('/fx/oanda')
+      .get('/fx/chart')
       .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
       .send()
       .expect(200);
   });
 
-  test('Should not get ticker information without authentication', async () => {
+  test('Should return fx info of a specific symbol', async () => {
+    const response = await request(app)
+      .get('/fx/chart?symbol=GBP/PLN')
+      .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
+      .send()
+      .expect(200);
+    // expect(response.length).toBe(4);
+  });
+
+  test('Should return fx chart with conditions', async () => {
     await request(app)
-      .get('/fx/oanda')
+      .get('/fx/chart?exchage=OANDA&sortBy=popularity:desc&limit=5')
+      .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
+      .send()
+      .expect(200);
+  });
+
+  test('Should not return fx chart with invalid conditions', async () => {
+    await request(app)
+      .get('/fx/chart?sortBy=name:desc')
+      .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
+      .send()
+      .expect(400);
+  });
+
+  test('Should not return fx chart without authentication', async () => {
+    await request(app)
+      .get('/fx/chart')
+      .send()
+      .expect(401);
+  });
+
+  test('Should return supported forex symbols of the exchange', async () => {
+    await request(app)
+      .get('/fx/chart?exchange=oanda')
+      .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)
+      .send()
+      .expect(200);
+  });
+
+  test('Should not get fx information without authentication', async () => {
+    await request(app)
+      .get('/fx/chart')
       .send()
       .expect(401);
   })
