@@ -37,6 +37,7 @@ A backend beginner's side project based on Finnhub API
   * GET /fx/chart?symbol=FXCM:USD/HKD -> OK
   * POST /fx/FXCM:USD%2FHKD -> use %2F instead of forware slash (/)
   * DELETE /fx/FXCM:USD%2FHKD -> use %2F instead of forware slash (/)
+* add limit parameter to improve the query efficiency
 
 ## Goals
 

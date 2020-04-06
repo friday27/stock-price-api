@@ -35,7 +35,8 @@ router.get('/stocks/chart', auth, async (req, res) => {
     const results = await Price.find(match, null, {
       sort,
       skip: parseInt(req.query.skip),
-      limit: parseInt(req.query.limit)
+      limit: parseInt(req.params.limit),
+      token: req.user.finnhubToken
     });
     res.send(results);
   } catch (e) {

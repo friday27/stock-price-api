@@ -65,6 +65,26 @@ priceSchema.methods.toJSON = function() {
   return priceObj;
 };
 
+
+// Before return Price.find() results, check if all prices are up-to-date.
+// If not, update it by user's finnhubToken
+let finnhubToken = '';
+const updatePrices = function(results) {
+  // Check if the time is in 9 am to 4 pm on weekdays & not bank holiday
+  // If not -> skip this step
+  results.forEach((obj) => {
+    // Check if updatedAt is in 5 minutes
+    // If not, update the price
+  });
+};
+
+priceSchema.pre('find', function(next) {
+  finnhubToken = this.getOptions().token;
+  next();
+});
+
+priceSchema.post('find', updatePrices);
+
 const Price = mongooese.model('Price', priceSchema);
 
 module.exports = Price;
