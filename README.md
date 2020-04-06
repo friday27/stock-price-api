@@ -8,8 +8,6 @@ A backend beginner's side project based on Finnhub API
 
 * Test suites and routers
   * Issues
-    * delete user -> delete fx/stock data
-    * symbol issue: FXCM:USD/HKD (use it in POST and DELETE test cases)
     * add pre find in Price model to update stock prices
 
   * TODOs
@@ -21,14 +19,24 @@ A backend beginner's side project based on Finnhub API
     * Check multi-threading update price info
 
 * Logging
+  * https://devcenter.heroku.com/articles/node-best-practices
+
 * Versioning
+  * https://techbrij.com/nodejs-api-versioning-express-routers
+  * https://stackoverflow.com/questions/51513715/node-js-rest-api-versioning-the-right-way
+  * https://nodesource.com/blog/understanding-how-node-js-release-lines-work/
 
 * Multi-threading update? (A and B are trying to follow the same ticker at the same time.)
 
 * Automaticallly update Price collection
   * Stock/forex symbols
 
-### Questions
+## API Doc
+
+* symbol issue: FXCM:USD/HKD (use it in POST and DELETE test cases)
+  * GET /fx/chart?symbol=FXCM:USD/HKD -> OK
+  * POST /fx/FXCM:USD%2FHKD -> use %2F instead of forware slash (/)
+  * DELETE /fx/FXCM:USD%2FHKD -> use %2F instead of forware slash (/)
 
 ## Goals
 

@@ -88,9 +88,9 @@ describe('Test GET /fx', () => {
 // Add fx symbol into watchlish
 describe('Test POST /fx', () => {
   test('Should add fx into user\'s watchlist', async () => {
-    const symbol = 'FXCM:FRA40';
+    const symbol = 'FXCM:CAD%2FCHF';
     // Save the original popularity
-    const price = await Price.findOne({symbol});
+    const price = await Price.findOne({symbol:'FXCM:CAD/CHF'});
     const pop = price.popularity;
 
     await request(app)
@@ -100,10 +100,10 @@ describe('Test POST /fx', () => {
       .expect(201);
 
     // Assert the ticker is saved in database
-    const foundFx = await Forex.findOne({userId: user1._id, symbol});
+    const foundFx = await Forex.findOne({userId: user1._id, symbol: 'FXCM:CAD/CHF'});
     expect(foundFx).not.toBeNull();
     // Assert the popularity of ticker += 1
-    const afterPrice = await Price.findOne({symbol});
+    const afterPrice = await Price.findOne({symbol:'FXCM:CAD/CHF'});
     const afterPop = afterPrice.popularity;
     expect(afterPop-pop).toBe(1);
   });
@@ -126,7 +126,7 @@ describe('Test POST /fx', () => {
 
 describe('Test DELETE /fx', () => {
   test('Should delete fx symbol from user\'s watchlist', async () => {
-    const symbol = 'OANDA:EU50_EUR';
+    const symbol = 'FXCM:BTC%2FUSD';
     await request(app)
       .post('/fx/'+symbol)
       .set('Authorization', `Bearer ${user1.jsonWebTokens[0].jsonWebToken}`)

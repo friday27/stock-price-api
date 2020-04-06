@@ -93,7 +93,7 @@ router.get('/fx', auth, async (req, res) => {
 
 // Add fx symbol into the user's watchlish
 router.post('/fx/:symbol', auth, async (req, res) => {
-  const symbol = await req.params.symbol;
+  const symbol = await req.params.symbol.replace('%2F', '/');
   if (!symbol) {
     res.status(400).send();
   }
@@ -150,7 +150,7 @@ router.delete('/fx/:symbol', auth, async (req, res) => {
       symbol: req.params.symbol
     });
   
-    res.send(deleted);
+    res.send();
   } catch (e) {
     res.status(500).send();
   }
