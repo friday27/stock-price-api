@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 
 const app = require('../src/app');
 const User = require('../src/models/user');
+const Stock = require('../src/models/stock');
+const Forex = require('../src/models/forex');
 const {user1, user1auth, setupDatabase} = require('./fixtures/db');
 
 beforeEach(async () => {
@@ -134,6 +136,12 @@ describe('Test DELETE /users', () => {
     // Assert the deleted user is not in database anymore.
     const foundUser = await User.findById(response.body._id);
     expect(foundUser).toBeNull();
+
+    // Assert data with user id in Stock and Forex collections is removed.
+    const stock = await Stock.find({userId: user1._id});
+    expect(stock.length).toBe(0);
+    const forex = await Forex.find({userId: user1._id});
+    expect(forex.length).toBe(0);
   });
 
   test('Should not delete a user without authentication', async () => {

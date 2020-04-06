@@ -3,6 +3,8 @@ const validator = require('validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const isValidFinnhubToken = require('../utils/token-validator');
+const Stock = require('./stock');
+const Forex = require('./forex');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -94,6 +96,13 @@ userSchema.pre('save', async function(next) {
     user.password = await bcrypt.hash(user.password, 8);
   }
 
+  next();
+});
+
+userSchema.pre('remove', async function(next) {
+  const user = this;
+  await Stock.deleteMany({userId: user._id});
+  await Forex.deleteMany({userId: user._id});
   next();
 });
 
