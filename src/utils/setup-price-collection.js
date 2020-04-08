@@ -10,7 +10,7 @@ const mongooese = require('mongoose');
 const fs = require('fs');
 const Price = require('../models/price');
 
-async function setupPriceCollection() {
+async function setup() {
   await mongooese.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useCreateIndex: true,
@@ -59,8 +59,12 @@ async function setupPriceCollection() {
   });
 };
 
-setupPriceCollection();
+function setupPriceCollection() {
+  setup();
 
-setTimeout(() => {
-  mongooese.disconnect();
-}, 3000);
+  setTimeout(() => {
+    mongooese.disconnect();
+  }, 3000);
+};
+
+module.exports = setupPriceCollection;
