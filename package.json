@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/utils/setup-price-collection.js && node src/index.js",
     "dev": "env-cmd -f ./config/dev.env nodemon src/index.js",
-    "test": "env-cmd -f ./config/test.env jest --detectOpenHandles --runInBand --watchAll"
+    "test": "node src/utils/setup-price-collection.js && env-cmd -f ./config/test.env jest --detectOpenHandles --runInBand --watchAll"
   },
   "jest": {
     "testEnvironment": "node"

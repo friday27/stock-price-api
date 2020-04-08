@@ -104,8 +104,8 @@ router.get('/stocks', auth, async (req, res) => {
   let cost = 0;
   await stocks.forEach(async (stockObj) => {
     // If the price is updated 5 minutes age, request and save the latest price.
-    const minutes = await Math.floor(Math.abs(new Date() - stockObj.priceInfo[0].updatedAt)/60000);
-    if (minutes >= 0) {
+    // const minutes = await Math.floor(Math.abs(new Date() - stockObj.priceInfo[0].updatedAt)/60000);
+    if (new Date() - stockObj.updatedAt >= 0) {
       await updateStockPrice(req.user.finnhubToken, stockObj.ticker, async (err) => {
         if (err) {
           console.log(err);

@@ -52,14 +52,15 @@ router.get('/fx/chart', auth, async (req, res) => {
       }
     });
 
-    setTimeout(async () => {
-      const updatedResults = await Price.find(match, null, {
-        sort,
-        skip: parseInt(req.query.skip),
-        limit: limit
-      })
-      res.send(updatedResults);
-    }, 2000);
+    res.send(results);
+    // setTimeout(async () => {
+    //   const updatedResults = await Price.find(match, null, {
+    //     sort,
+    //     skip: parseInt(req.query.skip),
+    //     limit: limit
+    //   })
+    //   res.send(updatedResults);
+    // }, 2000);
   } catch (e) {
     res.status(500).send();
   }
@@ -96,8 +97,8 @@ router.get('/fx', auth, async (req, res) => {
   
   await fx.forEach(async (fxObj) => {
     // If the price is updated 5 minutes age, request and save the latest price.
-    const minutes = await Math.floor(Math.abs(new Date() - fxObj.priceInfo[0].updatedAt)/60000);
-    if (minutes >= 0) {
+    // const minutes = await Math.floor(Math.abs(new Date() - fxObj.priceInfo[0].updatedAt)/60000);
+    if (new Date() - fxObj.updatedAt >= 0) {
       await updateFxPrice(req.user.finnhubToken, fxObj.symbol, async (err) => {
         if (err) {
           console.log(err);
@@ -106,35 +107,36 @@ router.get('/fx', auth, async (req, res) => {
     }
   });
 
-  setTimeout(async () => {
-    const newFx = await Forex.aggregate([
-      // Find fx transactions with userId
-        {$match: {
-          userId: req.user._id.toString()
-        }},
-        // Populate price info from prices collections
-        {$lookup: {
-          from: 'prices',
-          localField: 'symbol',
-          foreignField: 'symbol',
-          as: 'priceInfo',
-        }},
-        // adjust output format
-        {$project: {
-          _id: 0,
-          symbol: 1,
-          priceInfo: {
-            exchange: 1,
-            displaySymbol: 1,
-            description: 1,
-            price: 1,
-            popularity: 1,
-            updatedAt: 1
-          }
-        }}
-      ]);
-    res.send(newFx);
-  }, 2000);
+  res.send(fx);
+  // setTimeout(async () => {
+  //   const newFx = await Forex.aggregate([
+  //     // Find fx transactions with userId
+  //       {$match: {
+  //         userId: req.user._id.toString()
+  //       }},
+  //       // Populate price info from prices collections
+  //       {$lookup: {
+  //         from: 'prices',
+  //         localField: 'symbol',
+  //         foreignField: 'symbol',
+  //         as: 'priceInfo',
+  //       }},
+  //       // adjust output format
+  //       {$project: {
+  //         _id: 0,
+  //         symbol: 1,
+  //         priceInfo: {
+  //           exchange: 1,
+  //           displaySymbol: 1,
+  //           description: 1,
+  //           price: 1,
+  //           popularity: 1,
+  //           updatedAt: 1
+  //         }
+  //       }}
+  //     ]);
+  //   res.send(newFx);
+  // }, 2000);
 });
 
 // Add fx symbol into the user's watchlish
