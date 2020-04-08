@@ -34,45 +34,27 @@ function getExchangeInfo(token, exchange, callback) {
 function updateStockPrice(token, ticker, callback) {
   request(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${token}`, {json: true}, async (err, res, body) => {
     let price;
-    if (err || !body.c) { 
-      price = await Price.findOne({displaySymbol: ticker});
-      price.price = null;
-      price.updatedAt = new Date();
-      await price.save();
-      // Price.findOneAndUpdate({displaySymbol: ticker}, {$set: {price: null}});
-      callback(err);
-    }
     try {
       price = await Price.findOne({displaySymbol: ticker});
       price.price = body.c;
       price.updatedAt = new Date();
       await price.save();
+      // callback();
       // Price.findOneAndUpdate({displaySymbol: ticker}, {$set: {price: body.c}});
     } catch (e) {
-      console.log(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${token}`);
-      callback(e);
+      const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${token}`;
+      callback(`Error: ${e}\nURL: ${url}`);
     }
-    
-    callback();
   });
 };
 
 function updateFxPrice(token, symbol, callback) {
   request(`https://finnhub.io/api/v1/forex/candle?symbol=${symbol}&resolution=D&count=1&token=${token}`, {json: true}, async (err, res, body) => {
-    let price;
-    if (err || !body.s || body.s !== 'ok') { 
-      price = await Price.findOne({symbol});
-      price.price = null;
-      price.updatedAt = new Date();
-      await price.save();
-      callback(err);
-    }
     try {
       price = await Price.findOne({symbol});
-      price.price = body.c? body.c[0]: null;
+      price.price = body.c[0];
       price.updatedAt = new Date();
       await price.save();
-      callback();
     } catch (e) {
       callback(e);
     }

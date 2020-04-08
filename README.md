@@ -4,32 +4,29 @@ A backend beginner's side project based on Finnhub API
 
 ## TODOs
 
-* Create stock/forex collections (price model) while deploying
+1. Update price info before sending responses (add a function in utils/get-latest-price.js) [done]
 
-* Test suites and routers
-  * Issues
-    * add pre find in Price model to update stock prices
+2. Clean and create price collection from data/ before starting server (add a function in utils/setup-price-collection.js) [done]
 
-  * TODOs
-    * setupDatabase
-      * create price collection
+3. Setup MongoDB Compass
+
+4. More
+    * Versioning
+      * https://techbrij.com/nodejs-api-versioning-express-routers
+      * https://stackoverflow.com/questions/51513715/node-js-rest-api-versioning-the-right-way
+      * https://nodesource.com/blog/understanding-how-node-js-release-lines-work/
+
     * GET /fx: adjust output format
-    * routers/stock.js -> add time constrains to get /stocks (if it's bank holiday or off hours, do not update price info)
     * /stocks: support searching for multiple tickers
+
+    * tests/fixtures/db.js -> setupDatabase: create price collection
+    * routers/stock.js -> add time constrains to get /stocks (if it's bank holiday or off hours, do not update price info)
     * Check multi-threading update price info
 
-* Logging
-  * https://devcenter.heroku.com/articles/node-best-practices
+    * Logging
+      * https://devcenter.heroku.com/articles/node-best-practices
 
-* Versioning
-  * https://techbrij.com/nodejs-api-versioning-express-routers
-  * https://stackoverflow.com/questions/51513715/node-js-rest-api-versioning-the-right-way
-  * https://nodesource.com/blog/understanding-how-node-js-release-lines-work/
-
-* Multi-threading update? (A and B are trying to follow the same ticker at the same time.)
-
-* Automaticallly update Price collection
-  * Stock/forex symbols
+    * Update price updating function (currently using setTimeout...)
 
 ## API Doc
 
@@ -37,7 +34,7 @@ A backend beginner's side project based on Finnhub API
   * GET /fx/chart?symbol=FXCM:USD/HKD -> OK
   * POST /fx/FXCM:USD%2FHKD -> use %2F instead of forware slash (/)
   * DELETE /fx/FXCM:USD%2FHKD -> use %2F instead of forware slash (/)
-* add limit parameter to improve the query efficiency
+* query limit: 50
 
 ## Goals
 

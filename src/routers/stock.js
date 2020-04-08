@@ -31,14 +31,34 @@ router.get('/stocks/chart', auth, async (req, res) => {
     match.currency = req.query.currency;
   }
 
+  let limit = 50;
+  if (req.query.limit && parseInt(req.query.limit) <= 50) {
+    limit = parseInt(req.query.limit)
+  }
   try {
-    const results = await Price.find(match, null, {
+    let results = await Price.find(match, null, {
       sort,
       skip: parseInt(req.query.skip),
-      limit: parseInt(req.params.limit),
-      token: req.user.finnhubToken
+      limit
     });
-    res.send(results);
+
+    await results.forEach((result) => {
+      // Check if updatedAt is before 10 minutes ago. If so, update price info.
+      if (new Date() - result.updatedAt >= 0) {//10*60*1000) {
+        updateStockPrice(req.user.finnhubToken, result.symbol, (err) => {
+          console.log(err);
+        });
+      }
+    });
+
+    setTimeout(async () => {
+      updatedResults = await Price.find(match, null, {
+        sort,
+        skip: parseInt(req.query.skip),
+        limit
+      });
+      res.send(updatedResults);
+    }, 2000);
   } catch (e) {
     res.status(500).send();
   }
@@ -85,13 +105,13 @@ router.get('/stocks', auth, async (req, res) => {
   await stocks.forEach(async (stockObj) => {
     // If the price is updated 5 minutes age, request and save the latest price.
     const minutes = await Math.floor(Math.abs(new Date() - stockObj.priceInfo[0].updatedAt)/60000);
-    if (minutes > 5) {
+    if (minutes >= 0) {
       await updateStockPrice(req.user.finnhubToken, stockObj.ticker, async (err) => {
         if (err) {
           console.log(err);
         }
       });
-      const newData = await Price.findOne({displaySymbol: stockObj.ticker});
+      const newData = await Price.findOne({symbol: stockObj.ticker});
       stockObj.priceInfo[0].price = newData.price;
       stockObj.priceInfo[0].updatedAt = newData.updatedAt;
     }

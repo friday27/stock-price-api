@@ -33,13 +33,33 @@ router.get('/fx/chart', auth, async (req, res) => {
     match.displaySymbol = req.query.displaySymbol;
   }
 
+  let limit = 50;
+  if (req.query.limit && parseInt(req.query.limit) <= 50) {
+    limit = parseInt(req.query.limit)
+  }
   try {
     const results = await Price.find(match, null, {
       sort,
       skip: parseInt(req.query.skip),
-      limit: parseInt(req.query.limit)
+      limit: limit
     })
-    res.send(results);
+
+    results.forEach((result) => {
+      if (new Date() - result.updatedAt >= 0) { //should be like 10 minutes (1000*60*10)
+        updateFxPrice(req.user.finnhubToken, result.symbol, (err) => {
+          console.log(err);
+        })
+      }
+    });
+
+    setTimeout(async () => {
+      const updatedResults = await Price.find(match, null, {
+        sort,
+        skip: parseInt(req.query.skip),
+        limit: limit
+      })
+      res.send(updatedResults);
+    }, 2000);
   } catch (e) {
     res.status(500).send();
   }
@@ -83,12 +103,38 @@ router.get('/fx', auth, async (req, res) => {
           console.log(err);
         }
       });
-      const newData = await Price.findOne({symbol: fxObj.symbol});
-      fxObj.price = newData.price;
-      fxObj.updatedAt = newData.updatedAt;
     }
   });
-  res.send(fx);
+
+  setTimeout(async () => {
+    const newFx = await Forex.aggregate([
+      // Find fx transactions with userId
+        {$match: {
+          userId: req.user._id.toString()
+        }},
+        // Populate price info from prices collections
+        {$lookup: {
+          from: 'prices',
+          localField: 'symbol',
+          foreignField: 'symbol',
+          as: 'priceInfo',
+        }},
+        // adjust output format
+        {$project: {
+          _id: 0,
+          symbol: 1,
+          priceInfo: {
+            exchange: 1,
+            displaySymbol: 1,
+            description: 1,
+            price: 1,
+            popularity: 1,
+            updatedAt: 1
+          }
+        }}
+      ]);
+    res.send(newFx);
+  }, 2000);
 });
 
 // Add fx symbol into the user's watchlish
